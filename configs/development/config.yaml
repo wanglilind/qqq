@@ -1,0 +1,79 @@
+service:
+  name: "global-fair-currency"
+  version: "1.0.0"
+  port: 8080
+  environment: "development"
+
+database:
+  host: "localhost"
+  port: 5432
+  user: "gfc_user"
+  password: "your_password"
+  dbname: "gfc_db"
+  max_connections: 100
+  connection_timeout: 30s
+
+security:
+  jwt_secret: "your_jwt_secret"
+  token_expiration: 24h
+  max_login_attempts: 5
+  password_min_length: 12
+  biometric_threshold: 0.95
+
+monitoring:
+  metrics_interval: 15s
+  alert_retention_period: 168h  # 7 days
+  log_level: "debug"
+  prometheus_port: 9090
+
+consensus:
+  algorithm: "hybrid_pos_pbft"
+  block_time: 15s
+  min_validators: 4
+  max_validators: 100
+  stake_threshold: 1000000
+  consensus_threshold: 0.67
+
+network:
+  p2p_port: 6000
+  bootstrap_nodes:
+    - "node1.gfc.network:6000"
+    - "node2.gfc.network:6000"
+  max_peers: 50
+  connection_timeout: 5s
+
+identity:
+  biometric_providers:
+    - name: "facial_recognition"
+      threshold: 0.95
+      timeout: 30s
+    - name: "fingerprint"
+      threshold: 0.98
+      timeout: 15s
+  verification_timeout: 60s
+  cache_duration: 300s
+
+transaction:
+  min_amount: 1
+  max_amount: 1000000
+  daily_limit: 100000
+  fee_rate: 0.001
+  confirmation_blocks: 6
+
+lifecycle:
+  base_duration: 120y
+  decay_rate: 0.00833  # 1/120 per year
+  minimum_balance: 100
+  grace_period: 30d
+
+alerts:
+  email:
+    smtp_host: "smtp.example.com"
+    smtp_port: 587
+    from_address: "alerts@gfc.network"
+  slack:
+    webhook_url: "https://hooks.slack.com/services/xxx"
+  notification_levels:
+    - "CRITICAL"
+    - "ERROR"
+    - "WARNING" 

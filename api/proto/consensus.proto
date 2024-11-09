@@ -1,0 +1,83 @@
+syntax = "proto3";
+
+package consensus;
+
+option go_package = "github.com/wanglilind/qqq/api/proto/consensus";
+
+service ConsensusService {
+    // 提议新区块
+    rpc ProposeBlock (ProposeBlockRequest) returns (ProposeBlockResponse);
+    
+    // 获取共识状态
+    rpc GetConsensusStatus (GetConsensusStatusRequest) returns (GetConsensusStatusResponse);
+    
+    // 节点注册
+    rpc RegisterNode (RegisterNodeRequest) returns (RegisterNodeResponse);
+    
+    // 同步区块
+    rpc SyncBlocks (SyncBlocksRequest) returns (stream Block);
+}
+
+message Block {
+    string block_id = 1;           // 区块ID
+    string previous_block_id = 2;   // 前一个区块ID
+    int64 timestamp = 3;           // 时间戳
+    string proposer_id = 4;        // 提议者ID
+    repeated Transaction transactions = 5;  // 交易列表
+    bytes merkle_root = 6;         // Merkle树根
+    bytes signature = 7;           // 区块签名
+    int64 height = 8;             // 区块高度
+}
+
+message Transaction {
+    string transaction_id = 1;     // 交易ID
+    string sender_id = 2;          // 发送者ID
+    string recipient_id = 3;       // 接收者ID
+    uint64 amount = 4;            // 金额
+    int64 timestamp = 5;          // 时间戳
+    bytes signature = 6;          // 交易签名
+}
+
+message ProposeBlockRequest {
+    string proposer_id = 1;        // 提议者ID
+    repeated Transaction transactions = 2;  // 待打包交易
+    int64 timestamp = 3;          // 提议时间戳
+}
+
+message ProposeBlockResponse {
+    string block_id = 1;          // 区块ID
+    string consensus_id = 2;       // 共识ID
+    string status = 3;            // 状态
+    string message = 4;           // 响应信息
+}
+
+message GetConsensusStatusRequest {
+    string node_id = 1;           // 节点ID
+}
+
+message GetConsensusStatusResponse {
+    int64 current_round = 1;      // 当前轮次
+    int32 active_nodes = 2;       // 活跃节点数
+    string consensus_state = 3;    // 共识状态
+    string last_block_id = 4;      // 最新区块ID
+    int64 last_update_time = 5;   // 最后更新时间
+}
+
+message RegisterNodeRequest {
+    string node_id = 1;           // 节点ID
+    string endpoint = 2;          // 节点地址
+    string public_key = 3;        // 公钥
+    string node_type = 4;         // 节点类型
+}
+
+message RegisterNodeResponse {
+    bool success = 1;             // 注册结果
+    string message = 2;           // 响应信息
+    repeated string peer_endpoints = 3;  // 对等节点列表
+}
+
+message SyncBlocksRequest {
+    string node_id = 1;           // 节点ID
+    int64 from_height = 2;        // 起始高度
+    int64 to_height = 3;          // 结束高度
+} 

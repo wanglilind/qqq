@@ -1,0 +1,78 @@
+stages:
+  - test
+  - build
+  - deploy
+
+variables:
+  DOCKER_REGISTRY: "registry.example.com/wanglilind/qqq"
+  KUBE_CONFIG: ${KUBE_CONFIG}
+  GO_VERSION: "1.20"
+  GOPROXY: "https://mirrors.aliyun.com/goproxy/,direct"
+  GOSUMDB: "off"
+  GO111MODULE: "on"
+
+.go-cache:
+  cache:
+    paths:
+      - .go/pkg/mod
+
+test:
+  stage: test
+  image: golang:${GO_VERSION}
+  extends: .go-cache
+  before_script:
+    - go env -w GOPROXY=${GOPROXY}
+    - go env -w GOSUMDB=${GOSUMDB}
+    - go env -w GO111MODULE=on
+  script:
+    - make test
+    - make lint
+  coverage: '/coverage: \d+.\d+% of statements/'
+
+build:
+  stage: build
+  image: docker:latest
+  services:
+    - docker:dind
+  script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $DOCKER_REGISTRY
+    - |
+      for service in identity transaction consensus monitor; do
+        docker build -t $DOCKER_REGISTRY/gfc-$service:$CI_COMMIT_SHA -f deployments/docker/Dockerfile .
+        docker push $DOCKER_REGISTRY/gfc-$service:$CI_COMMIT_SHA
+        if [ "$CI_COMMIT_BRANCH" = "main" ]; then
+          docker tag $DOCKER_REGISTRY/gfc-$service:$CI_COMMIT_SHA $DOCKER_REGISTRY/gfc-$service:latest
+          docker push $DOCKER_REGISTRY/gfc-$service:latest
+        fi
+      done
+
+deploy-staging:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  environment:
+    name: staging
+  script:
+    - echo "$KUBE_CONFIG" > kubeconfig
+    - export KUBECONFIG=kubeconfig
+    - |
+      for service in identity transaction consensus monitor; do
+        kubectl set image deployment/$service-service $service=$DOCKER_REGISTRY/gfc-$service:$CI_COMMIT_SHA -n gfc-staging
+      done
+  only:
+    - develop
+
+deploy-production:
+  stage: deploy
+  image: bitnami/kubectl:latest
+  environment:
+    name: production
+  script:
+    - echo "$KUBE_CONFIG" > kubeconfig
+    - export KUBECONFIG=kubeconfig
+    - |
+      for service in identity transaction consensus monitor; do
+        kubectl set image deployment/$service-service $service=$DOCKER_REGISTRY/gfc-$service:$CI_COMMIT_SHA -n gfc
+      done
+  only:
+    - main
+  when: manual 

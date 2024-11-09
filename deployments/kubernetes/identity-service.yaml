@@ -1,0 +1,110 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: identity-service
+  namespace: gfc
+  labels:
+    app: identity-service
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: identity-service
+  template:
+    metadata:
+      labels:
+        app: identity-service
+    spec:
+      containers:
+      - name: identity-service
+        image: gfc/identity-service:latest
+        ports:
+        - containerPort: 8080
+          name: http
+        - containerPort: 6000
+          name: p2p
+        env:
+        - name: APP_ENV
+          value: "production"
+        - name: SERVICE_NAME
+          value: "identity-service"
+        envFrom:
+        - configMapRef:
+            name: gfc-config
+        - secretRef:
+            name: gfc-secrets
+        resources:
+          requests:
+            cpu: "500m"
+            memory: "512Mi"
+          limits:
+            cpu: "1000m"
+            memory: "1Gi"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8080
+          initialDelaySeconds: 30
+          periodSeconds: 10
+        readinessProbe:
+          httpGet:
+            path: /ready
+            port: 8080
+          initialDelaySeconds: 5
+          periodSeconds: 5
+        volumeMounts:
+        - name: config-volume
+          mountPath: /etc/gfc/configs
+        - name: data-volume
+          mountPath: /var/lib/gfc
+      volumes:
+      - name: config-volume
+        configMap:
+          name: gfc-config
+      - name: data-volume
+        persistentVolumeClaim:
+          claimName: gfc-data-pvc
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: identity-service
+  namespace: gfc
+spec:
+  selector:
+    app: identity-service
+  ports:
+  - name: http
+    port: 80
+    targetPort: 8080
+  - name: p2p
+    port: 6000
+    targetPort: 6000
+  type: ClusterIP
+
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: identity-service-ingress
+  namespace: gfc
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+spec:
+  tls:
+  - hosts:
+    - identity.gfc.network
+    secretName: identity-tls
+  rules:
+  - host: identity.gfc.network
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: identity-service
+            port:
+              number: 80 

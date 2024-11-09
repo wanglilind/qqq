@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package identity;
+
+option go_package = "github.com/wanglilind/qqq/api/proto/identity";
+
+service IdentityService {
+    // 注册新用户身份
+    rpc RegisterIdentity (RegisterIdentityRequest) returns (RegisterIdentityResponse);
+    
+    // 验证用户身份
+    rpc VerifyIdentity (VerifyIdentityRequest) returns (VerifyIdentityResponse);
+    
+    // 获取身份状态
+    rpc GetIdentityStatus (GetIdentityStatusRequest) returns (GetIdentityStatusResponse);
+    
+    // 更新生物特征数据
+    rpc UpdateBiometricData (UpdateBiometricDataRequest) returns (UpdateBiometricDataResponse);
+}
+
+message RegisterIdentityRequest {
+    string user_id = 1;         // 用户ID
+    bytes biometric_data = 2;    // 生物特征数据
+    string national_id = 3;     // 国家身份证号
+    string country_code = 4;    // 国家代码
+    string birth_date = 5;      // 出生日期
+}
+
+message RegisterIdentityResponse {
+    string identity_id = 1;     // 身份ID
+    string status = 2;          // 状态
+}
+
+message VerifyIdentityRequest {
+    string identity_id = 1;     // 身份ID
+    bytes biometric_data = 2;    // 生物特征数据
+}
+
+message VerifyIdentityResponse {
+    bool valid = 1;            // 验证结果
+    string message = 2;        // 验证信息
+    int64 verify_time = 3;     // 验证时间
+}
+
+message GetIdentityStatusRequest {
+    string identity_id = 1;     // 身份ID
+}
+
+message GetIdentityStatusResponse {
+    string status = 1;         // 身份状态
+    int64 last_activity = 2;   // 最后活动时间
+    bool is_active = 3;        // 是否活跃
+}
+
+message UpdateBiometricDataRequest {
+    string identity_id = 1;     // 身份ID
+    bytes new_biometric_data = 2;  // 新的生物特征数据
+}
+
+message UpdateBiometricDataResponse {
+    bool success = 1;          // 更新结果
+    string message = 2;        // 更新信息
+    int64 update_time = 3;     // 更新时间
+} 

@@ -1,0 +1,77 @@
+syntax = "proto3";
+
+package transaction;
+
+option go_package = "github.com/wanglilind/qqq/api/proto/transaction";
+
+service TransactionService {
+    // 创建交易
+    rpc CreateTransaction (CreateTransactionRequest) returns (CreateTransactionResponse);
+    
+    // 获取交易历史
+    rpc GetTransactionHistory (GetTransactionHistoryRequest) returns (GetTransactionHistoryResponse);
+    
+    // 验证交易
+    rpc ValidateTransaction (ValidateTransactionRequest) returns (ValidateTransactionResponse);
+    
+    // 获取账户余额
+    rpc GetBalance (GetBalanceRequest) returns (GetBalanceResponse);
+}
+
+message Transaction {
+    string transaction_id = 1;  // 交易ID
+    string sender_id = 2;      // 发送者ID
+    string recipient_id = 3;    // 接收者ID
+    uint64 amount = 4;         // 交易金额
+    int64 timestamp = 5;       // 交易时间戳
+    string type = 6;           // 交易类型
+    string status = 7;         // 交易状态
+    bytes signature = 8;       // 交易签名
+}
+
+message CreateTransactionRequest {
+    string sender_id = 1;      // 发送者ID
+    string recipient_id = 2;    // 接收者ID
+    uint64 amount = 3;         // 交易金额
+    string type = 4;           // 交易类型
+}
+
+message CreateTransactionResponse {
+    string transaction_id = 1;  // 交易ID
+    string status = 2;         // 交易状态
+    int64 timestamp = 3;       // 处理时间戳
+    string message = 4;        // 响应信息
+}
+
+message GetTransactionHistoryRequest {
+    string user_id = 1;        // 用户ID
+    int64 start_time = 2;      // 开始时间
+    int64 end_time = 3;        // 结束时间
+    int32 page_size = 4;       // 每页数量
+    int32 page_number = 5;     // 页码
+}
+
+message GetTransactionHistoryResponse {
+    repeated Transaction transactions = 1;  // 交易列表
+    int32 total_count = 2;     // 总交易数
+    bool has_more = 3;         // 是否有更多
+}
+
+message ValidateTransactionRequest {
+    Transaction transaction = 1;  // 交易信息
+}
+
+message ValidateTransactionResponse {
+    bool valid = 1;            // 验证结果
+    string message = 2;        // 验证信息
+}
+
+message GetBalanceRequest {
+    string user_id = 1;        // 用户ID
+}
+
+message GetBalanceResponse {
+    uint64 balance = 1;        // 当前余额
+    int64 update_time = 2;     // 更新时间
+    string currency_status = 3; // 货币状态
+} 

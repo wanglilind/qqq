@@ -1,0 +1,70 @@
+version: '3.8'
+
+services:
+  # 数据库
+  postgres:
+    image: postgres:13
+    environment:
+      POSTGRES_USER: gfc_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: gfc_db
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+
+  # Redis缓存
+  redis:
+    image: redis:6
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
+  # 服务发现
+  consul:
+    image: consul:1.9
+    ports:
+      - "8500:8500"
+    volumes:
+      - consul_data:/consul/data
+
+  # 消息队列
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD}
+
+  # 监控
+  prometheus:
+    image: prom/prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+
+  grafana:
+    image: grafana/grafana
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+
+  identity:
+    image: ${DOCKER_REGISTRY}/identity:${VERSION}
+    environment:
+      - ENV=${ENV}
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+
+volumes:
+  postgres_data:
+  redis_data:
+  consul_data:
+  prometheus_data:
+  grafana_data: 

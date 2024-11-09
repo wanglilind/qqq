@@ -1,0 +1,113 @@
+services:
+  # Identity 服务
+  identity:
+    build:
+      context: ../../
+      dockerfile: deployments/docker/Dockerfile
+      args:
+        SERVICE: identity
+    image: wanglilind/qqq/identity:dev
+    env_file:
+      - .env
+    ports:
+      - "50051:50051"
+    environment:
+      - ENV=development
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=gfc
+      - DB_PASSWORD=gfc123
+      - DB_NAME=gfc_identity
+    depends_on:
+      postgres:
+        condition: service_started
+
+  # Transaction 服务
+  transaction:
+    build:
+      context: ../../
+      dockerfile: deployments/docker/Dockerfile
+      args:
+        SERVICE: transaction
+    env_file:
+      - .env
+    ports:
+      - "50052:50052"
+    environment:
+      - ENV=development
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_USER=gfc
+      - DB_PASSWORD=gfc123
+      - DB_NAME=gfc_transaction
+    depends_on:
+      postgres:
+        condition: service_started
+
+  # Consensus 服务
+  consensus:
+    build:
+      context: ../../
+      dockerfile: deployments/docker/Dockerfile
+      args:
+        SERVICE: consensus
+    env_file:
+      - .env
+    ports:
+      - "50053:50053"
+    environment:
+      - ENV=development
+    depends_on:
+      postgres:
+        condition: service_started
+
+  # Monitor 服务
+  monitor:
+    build:
+      context: ../../
+      dockerfile: deployments/docker/Dockerfile
+      args:
+        SERVICE: monitor
+    env_file:
+      - .env
+    ports:
+      - "50054:50054"
+    environment:
+      - ENV=development
+    depends_on:
+      postgres:
+        condition: service_started
+
+  # PostgreSQL 数据库
+  postgres:
+    image: postgres:13-alpine
+    environment:
+      - POSTGRES_USER=gfc
+      - POSTGRES_PASSWORD=gfc123
+      - POSTGRES_MULTIPLE_DATABASES=gfc_identity,gfc_transaction
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U gfc"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # Redis 缓存
+  redis:
+    image: redis:6-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
+  redis_data: 

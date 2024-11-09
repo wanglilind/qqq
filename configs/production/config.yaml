@@ -1,0 +1,22 @@
+service:
+  name: "global-fair-currency"
+  version: "1.0.0"
+  port: 443
+  environment: "production"
+
+# ... [其他配置与开发环境类似，但有更严格的安全设置]
+
+security:
+  jwt_secret: "${JWT_SECRET}"  # 从环境变量读取
+  token_expiration: 12h
+  max_login_attempts: 3
+  password_min_length: 16
+  biometric_threshold: 0.98
+
+monitoring:
+  metrics_interval: 10s
+  alert_retention_period: 720h  # 30 days
+  log_level: "info"
+  prometheus_port: 9090
+
+# ... [其他生产环境特定配置] 
