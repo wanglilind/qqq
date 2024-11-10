@@ -2,30 +2,13 @@ package service
 
 import (
 	"context"
-	"fmt"
 	"sync"
 	"time"
 
-	"github.com/google/uuid"
 	"github.com/wanglilind/qqq/pkg/config"
 	"github.com/wanglilind/qqq/pkg/database"
-	pb "github.com/wanglilind/qqq/api/proto"
+	  "github.com/wanglilind/qqq/api/proto/transaction"
 )
-
-const (
-	ErrInvalidRequest = "无效的请求"
-	ErrInsufficientBalance = "余额不足"
-	ErrInvalidSignature = "无效的签名"
-)
-
-type TransactionError struct {
-	Code    string
-	Message string
-}
-
-func (e *TransactionError) Error() string {
-	return e.Message
-}
 
 type TransactionService struct {
 	config *config.Config
@@ -64,7 +47,7 @@ func (s *TransactionService) CreateTransaction(ctx context.Context, req *pb.Crea
 	}
 
 	// 检查余额
-	if err := s.checkBalance(ctx, req.SenderId, req.Amount); err != nil {
+	if err := s.checkBalance(ctx, req.SenderID, req.Amount); err != nil {
 		return nil, err
 	}
 
@@ -165,18 +148,7 @@ func (s *TransactionService) GetBalance(ctx context.Context, req *pb.GetBalanceR
 
 // 内部辅助方法
 func (s *TransactionService) validateTransactionRequest(req *pb.CreateTransactionRequest) error {
-	if req.SenderId == "" || req.RecipientId == "" {
-		return &TransactionError{
-			Code:    ErrInvalidRequest,
-			Message: "发送者和接收者ID不能为空",
-		}
-	}
-	if req.Amount == 0 {
-		return &TransactionError{
-			Code:    ErrInvalidRequest,
-			Message: "交易金额必须大于0",
-		}
-	}
+	// 实现交易请求验证逻辑
 	return nil
 }
 
@@ -211,33 +183,6 @@ func (s *TransactionService) queryBalance(ctx context.Context, userID string) (u
 }
 
 func generateTransactionID() string {
-	return fmt.Sprintf("TX_%d_%s", time.Now().UnixNano(), uuid.New().String()[:8])
-}
-
-func (s *TransactionService) initDatabase() error {
-	// 检查必要的数据库表是否存在，如果不存在则创建
-	queries := []string{
-		`CREATE TABLE IF NOT EXISTS transactions (
-			id TEXT PRIMARY KEY,
-			sender_id TEXT NOT NULL,
-			recipient_id TEXT NOT NULL,
-			amount BIGINT NOT NULL,
-			type TEXT NOT NULL,
-			status TEXT NOT NULL,
-			timestamp BIGINT NOT NULL,
-			signature BYTEA
-		)`,
-		`CREATE TABLE IF NOT EXISTS balances (
-			user_id TEXT PRIMARY KEY,
-			amount BIGINT NOT NULL,
-			update_time BIGINT NOT NULL
-		)`,
-	}
-	
-	for _, query := range queries {
-		if _, err := s.db.Exec(query); err != nil {
-			return fmt.Errorf("初始化数据库失败: %v", err)
-		}
-	}
-	return nil
+	// 实现交易ID生成逻辑
+	return ""
 }

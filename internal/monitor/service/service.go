@@ -144,5 +144,5 @@ func (s *MonitorService) storeMetric(metric Metric) {
 
 // processAccumulatedMetrics å¤çç´¯ç§¯çææ ?
 func (s *MonitorService) processAccumulatedMetrics() {
-	// å®ç°æ¹éææ å¤çé»è¾
+	// å®ç°æ¹éææ å��çé»è¾
 } 

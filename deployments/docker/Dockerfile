@@ -36,7 +36,7 @@ RUN apk add --no-cache ca-certificates tzdata
 ENV TZ=Asia/Shanghai
 
 # 复制构建产物
-COPY --from=builder /app/github.com/wanglilind/qqq/bin/${SERVICE}-service /usr/local/bin/
+COPY --from=builder /app/./bin/${SERVICE}-service /usr/local/bin/
 
 # 设置入口点
 ENTRYPOINT ["/usr/local/bin/${SERVICE}-service"] 

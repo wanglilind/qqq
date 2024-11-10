@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.19.4
-// source: api/proto/transaction.proto
+// source: transaction.proto
 
 package transaction
 
@@ -77,7 +77,7 @@ func (c *transactionServiceClient) GetBalance(ctx context.Context, in *GetBalanc
 }
 
 // TransactionServiceServer is the server API for TransactionService service.
-// All implementations must embed UnimplementedTransactionServiceServer
+// All implementations should embed UnimplementedTransactionServiceServer
 // for forward compatibility
 type TransactionServiceServer interface {
 	// 创建交易
@@ -88,10 +88,9 @@ type TransactionServiceServer interface {
 	ValidateTransaction(context.Context, *ValidateTransactionRequest) (*ValidateTransactionResponse, error)
 	// 获取账户余额
 	GetBalance(context.Context, *GetBalanceRequest) (*GetBalanceResponse, error)
-	mustEmbedUnimplementedTransactionServiceServer()
 }
 
-// UnimplementedTransactionServiceServer must be embedded to have forward compatible implementations.
+// UnimplementedTransactionServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedTransactionServiceServer struct {
 }
 
@@ -107,7 +106,6 @@ func (UnimplementedTransactionServiceServer) ValidateTransaction(context.Context
 func (UnimplementedTransactionServiceServer) GetBalance(context.Context, *GetBalanceRequest) (*GetBalanceResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetBalance not implemented")
 }
-func (UnimplementedTransactionServiceServer) mustEmbedUnimplementedTransactionServiceServer() {}
 
 // UnsafeTransactionServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to TransactionServiceServer will
@@ -217,5 +215,5 @@ var TransactionService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "api/proto/transaction.proto",
+	Metadata: "transaction.proto",
 }

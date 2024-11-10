@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.19.4
-// source: api/proto/identity.proto
+// source: identity.proto
 
 package identity
 
@@ -77,7 +77,7 @@ func (c *identityServiceClient) UpdateBiometricData(ctx context.Context, in *Upd
 }
 
 // IdentityServiceServer is the server API for IdentityService service.
-// All implementations must embed UnimplementedIdentityServiceServer
+// All implementations should embed UnimplementedIdentityServiceServer
 // for forward compatibility
 type IdentityServiceServer interface {
 	// 注册新用户身份
@@ -88,10 +88,9 @@ type IdentityServiceServer interface {
 	GetIdentityStatus(context.Context, *GetIdentityStatusRequest) (*GetIdentityStatusResponse, error)
 	// 更新生物特征数据
 	UpdateBiometricData(context.Context, *UpdateBiometricDataRequest) (*UpdateBiometricDataResponse, error)
-	mustEmbedUnimplementedIdentityServiceServer()
 }
 
-// UnimplementedIdentityServiceServer must be embedded to have forward compatible implementations.
+// UnimplementedIdentityServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedIdentityServiceServer struct {
 }
 
@@ -107,7 +106,6 @@ func (UnimplementedIdentityServiceServer) GetIdentityStatus(context.Context, *Ge
 func (UnimplementedIdentityServiceServer) UpdateBiometricData(context.Context, *UpdateBiometricDataRequest) (*UpdateBiometricDataResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateBiometricData not implemented")
 }
-func (UnimplementedIdentityServiceServer) mustEmbedUnimplementedIdentityServiceServer() {}
 
 // UnsafeIdentityServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to IdentityServiceServer will
@@ -217,5 +215,5 @@ var IdentityService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "api/proto/identity.proto",
+	Metadata: "identity.proto",
 }

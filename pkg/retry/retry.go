@@ -32,12 +32,12 @@ func WithRetry(ctx context.Context, fn RetryableFunc, config RetryConfig) error 
 			return nil
 		} else {
 			lastErr = err
-			// 指数退�?
+			// 指数退
 			interval = time.Duration(float64(interval) * config.Multiplier)
 			if interval > config.MaxInterval {
 				interval = config.MaxInterval
 			}
-			time.Sleep(interval)
+				time.Sleep(interval)
 		}
 	}
 
@@ -55,7 +55,7 @@ type ExponentialBackoff struct {
 }
 
 func (eb *ExponentialBackoff) ShouldRetry(err error) bool {
-	// 判断错误是否可重�?
+	// 判断错误是否可重
 	switch err.(type) {
 	case *errors.Error:
 		code := err.(*errors.Error).Code

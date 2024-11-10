@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.2.0
 // - protoc             v3.19.4
-// source: api/proto/consensus.proto
+// source: consensus.proto
 
 package consensus
 
@@ -100,7 +100,7 @@ func (x *consensusServiceSyncBlocksClient) Recv() (*Block, error) {
 }
 
 // ConsensusServiceServer is the server API for ConsensusService service.
-// All implementations must embed UnimplementedConsensusServiceServer
+// All implementations should embed UnimplementedConsensusServiceServer
 // for forward compatibility
 type ConsensusServiceServer interface {
 	// 提议新区块
@@ -111,10 +111,9 @@ type ConsensusServiceServer interface {
 	RegisterNode(context.Context, *RegisterNodeRequest) (*RegisterNodeResponse, error)
 	// 同步区块
 	SyncBlocks(*SyncBlocksRequest, ConsensusService_SyncBlocksServer) error
-	mustEmbedUnimplementedConsensusServiceServer()
 }
 
-// UnimplementedConsensusServiceServer must be embedded to have forward compatible implementations.
+// UnimplementedConsensusServiceServer should be embedded to have forward compatible implementations.
 type UnimplementedConsensusServiceServer struct {
 }
 
@@ -130,7 +129,6 @@ func (UnimplementedConsensusServiceServer) RegisterNode(context.Context, *Regist
 func (UnimplementedConsensusServiceServer) SyncBlocks(*SyncBlocksRequest, ConsensusService_SyncBlocksServer) error {
 	return status.Errorf(codes.Unimplemented, "method SyncBlocks not implemented")
 }
-func (UnimplementedConsensusServiceServer) mustEmbedUnimplementedConsensusServiceServer() {}
 
 // UnsafeConsensusServiceServer may be embedded to opt out of forward compatibility for this service.
 // Use of this interface is not recommended, as added methods to ConsensusServiceServer will
@@ -245,5 +243,5 @@ var ConsensusService_ServiceDesc = grpc.ServiceDesc{
 			ServerStreams: true,
 		},
 	},
-	Metadata: "api/proto/consensus.proto",
+	Metadata: "consensus.proto",
 }

@@ -5,7 +5,6 @@ import (
 	"sync"
 	"time"
 
-	"github.com/wanglilind/qqq/pkg/contract"
 	"github.com/wanglilind/qqq/pkg/contract/event"
 )
 

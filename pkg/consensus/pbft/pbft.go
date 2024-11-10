@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/wanglilind/qqq/pkg/blockchain"
+	"github.com/wanglilind/qqq/pkg/network/p2p"
 )
 
 type State int
