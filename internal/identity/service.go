@@ -6,7 +6,7 @@ import (
 
 	"github.com/wanglilind/qqq/pkg/config"
 	"github.com/wanglilind/qqq/pkg/database"
-	"github.com/wanglilind/qqq/api/proto/identity"
+	pb "github.com/wanglilind/qqq/api/proto/identity"
 )
 
 type IdentityService struct {
